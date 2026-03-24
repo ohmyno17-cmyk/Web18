@@ -1,8 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog'
 import {
   Search,
   Play,
@@ -13,24 +17,38 @@ import {
   Sun,
   Moon,
   Heart,
-  ChevronDown
+  ChevronDown,
+  Loader2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 
-// Mock data
-const mockVideos = [
-  { id: '1', title: 'Tutorial Next.js 16 - Membangun Aplikasi Modern', thumbnail: 'https://picsum.photos/seed/v1/640/360', channel: 'Tech Academy', channelAvatar: 'https://picsum.photos/seed/c1/100/100', views: '125K', duration: '15:42', publishedAt: '2 hari lalu', country: 'ID' },
-  { id: '2', title: 'React Hooks Deep Dive', thumbnail: 'https://picsum.photos/seed/v2/640/360', channel: 'Code Master', channelAvatar: 'https://picsum.photos/seed/c2/100/100', views: '89K', duration: '22:18', publishedAt: '1 minggu lalu', country: 'ID' },
-  { id: '3', title: 'Design System dengan Tailwind CSS', thumbnail: 'https://picsum.photos/seed/v3/640/360', channel: 'UI Labs', channelAvatar: 'https://picsum.photos/seed/c3/100/100', views: '234K', duration: '18:05', publishedAt: '3 hari lalu', country: 'MY' },
-  { id: '4', title: 'TypeScript Tips & Tricks', thumbnail: 'https://picsum.photos/seed/v4/640/360', channel: 'Dev Tips', channelAvatar: 'https://picsum.photos/seed/c4/100/100', views: '567K', duration: '12:30', publishedAt: '5 hari lalu', country: 'SG' },
-  { id: '5', title: 'Building REST API dengan Node.js', thumbnail: 'https://picsum.photos/seed/v5/640/360', channel: 'Backend Pro', channelAvatar: 'https://picsum.photos/seed/c5/100/100', views: '78K', duration: '28:45', publishedAt: '1 hari lalu', country: 'ID' },
-  { id: '6', title: 'CSS Animation Mastery', thumbnail: 'https://picsum.photos/seed/v6/640/360', channel: 'Frontend Hub', channelAvatar: 'https://picsum.photos/seed/c6/100/100', views: '156K', duration: '20:12', publishedAt: '4 hari lalu', country: 'JP' },
-  { id: '7', title: 'Database Design Best Practices', thumbnail: 'https://picsum.photos/seed/v7/640/360', channel: 'Data School', channelAvatar: 'https://picsum.photos/seed/c7/100/100', views: '92K', duration: '35:00', publishedAt: '6 hari lalu', country: 'KR' },
-  { id: '8', title: 'Flutter vs React Native', thumbnail: 'https://picsum.photos/seed/v8/640/360', channel: 'Mobile Dev', channelAvatar: 'https://picsum.photos/seed/c8/100/100', views: '445K', duration: '16:55', publishedAt: '2 minggu lalu', country: 'ID' },
-  { id: '9', title: 'AI & Machine Learning Basics', thumbnail: 'https://picsum.photos/seed/v9/640/360', channel: 'AI Academy', channelAvatar: 'https://picsum.photos/seed/c9/100/100', views: '312K', duration: '45:20', publishedAt: '1 hari lalu', country: 'JP' },
-  { id: '10', title: 'Cyber Security Fundamentals', thumbnail: 'https://picsum.photos/seed/v10/640/360', channel: 'SecureCode', channelAvatar: 'https://picsum.photos/seed/c10/100/100', views: '198K', duration: '32:15', publishedAt: '3 hari lalu', country: 'SG' },
-  { id: '11', title: 'Cloud Computing dengan AWS', thumbnail: 'https://picsum.photos/seed/v11/640/360', channel: 'Cloud Masters', channelAvatar: 'https://picsum.photos/seed/c11/100/100', views: '267K', duration: '28:50', publishedAt: '5 hari lalu', country: 'MY' },
-  { id: '12', title: 'UI/UX Design Principles', thumbnail: 'https://picsum.photos/seed/v12/640/360', channel: 'Design Pro', channelAvatar: 'https://picsum.photos/seed/c12/100/100', views: '421K', duration: '19:30', publishedAt: '2 hari lalu', country: 'KR' },
-]
+// Types
+interface Video {
+  id: string
+  title: string
+  thumbnail: string
+  video_url: string
+  channel: string
+  channelAvatar: string
+  views: number
+  viewsFormatted: string
+  duration: string
+  durationSeconds: number
+  publishedAt: string
+  publishedAtFormatted: string
+  country: string
+  category: string
+  description: string
+}
+
+interface Category {
+  id: string
+  name: string
+  slug: string
+  count: number
+  icon: string
+}
 
 const countries = [
   { code: 'all', name: 'Semua', flag: '🌐' },
@@ -41,26 +59,120 @@ const countries = [
   { code: 'KR', name: 'Korea', flag: '🇰🇷' },
   { code: 'US', name: 'US', flag: '🇺🇸' },
   { code: 'GB', name: 'UK', flag: '🇬🇧' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
+  { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+  { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
 ]
-
-const categories = ['Semua', 'Tutorial', 'Design', 'Backend', 'Tips', 'Mobile']
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeCategory, setActiveCategory] = useState('Semua')
+  const [activeCategory, setActiveCategory] = useState('all')
   const [activeCountry, setActiveCountry] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [showCountries, setShowCountries] = useState(false)
+  const [showCategories, setShowCategories] = useState(false)
+  
+  const [videos, setVideos] = useState<Video[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadingCategories, setLoadingCategories] = useState(true)
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  
+  // Category pagination
+  const [categoryPage, setCategoryPage] = useState(0)
+  const categoriesPerPage = 12
 
-  const filteredVideos = mockVideos.filter(video => {
+  // Fetch categories from API
+  const fetchCategories = useCallback(async () => {
+    setLoadingCategories(true)
+    try {
+      const response = await fetch('/api/categories')
+      const data = await response.json()
+      
+      if (data.success && data.data) {
+        setCategories(data.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error)
+    } finally {
+      setLoadingCategories(false)
+    }
+  }, [])
+
+  // Fetch videos from API
+  const fetchVideos = useCallback(async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: '1',
+        limit: '20',
+        country: activeCountry,
+        search: searchQuery,
+        category: activeCategory
+      })
+      
+      const response = await fetch(`/api/videos?${params}`)
+      const data = await response.json()
+      
+      if (data.success && data.data) {
+        setVideos(data.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch videos:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [activeCountry, searchQuery, activeCategory])
+
+  // Initial fetch
+  useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
+
+  // Fetch videos when filters change
+  useEffect(() => {
+    fetchVideos()
+    
+    // Auto-refresh for new videos every 30 seconds
+    const interval = setInterval(fetchVideos, 30000)
+    return () => clearInterval(interval)
+  }, [fetchVideos])
+
+  // Play video
+  const handlePlayVideo = (video: Video) => {
+    setSelectedVideo(video)
+    setIsPlaying(true)
+  }
+
+  // Close video player
+  const handleClosePlayer = () => {
+    setIsPlaying(false)
+    setSelectedVideo(null)
+  }
+
+  const activeCountryData = countries.find(c => c.code === activeCountry)
+  const activeCategoryData = categories.find(c => c.id === activeCategory)
+
+  // Paginated categories
+  const paginatedCategories = categories.slice(
+    categoryPage * categoriesPerPage,
+    (categoryPage + 1) * categoriesPerPage
+  )
+  const totalCategoryPages = Math.ceil(categories.length / categoriesPerPage)
+
+  // Filter videos client-side for instant feedback
+  const filteredVideos = videos.filter(video => {
     const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = activeCategory === 'Semua'
+    const matchesCategory = activeCategory === 'all' || video.category === activeCategory || video.category === activeCategoryData?.slug
     const matchesCountry = activeCountry === 'all' || video.country === activeCountry
     return matchesSearch && matchesCategory && matchesCountry
   })
-
-  const activeCountryData = countries.find(c => c.code === activeCountry)
 
   return (
     <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-zinc-950' : 'bg-white'}`}>
@@ -108,12 +220,12 @@ export default function Home() {
                 {showCountries && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowCountries(false)} />
-                    <div className={`absolute right-0 top-full mt-1 w-44 rounded-lg border shadow-xl z-50 ${darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-gray-200'}`}>
+                    <div className={`absolute right-0 top-full mt-1 w-44 rounded-lg border shadow-xl z-50 max-h-80 overflow-y-auto ${darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-gray-200'}`}>
                       {countries.map((c) => (
                         <button
                           key={c.code}
                           onClick={() => { setActiveCountry(c.code); setShowCountries(false) }}
-                          className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm text-left first:rounded-t-lg last:rounded-b-lg ${
+                          className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm text-left ${
                             activeCountry === c.code 
                               ? (darkMode ? 'bg-zinc-800 text-white' : 'bg-gray-100 text-gray-900') 
                               : (darkMode ? 'text-zinc-200 hover:bg-zinc-800' : 'text-gray-700 hover:bg-gray-50')
@@ -177,114 +289,194 @@ export default function Home() {
 
       {/* Main */}
       <main className="flex-1 max-w-6xl mx-auto px-4 py-6 w-full">
-        {/* Categories */}
-        <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
-          {categories.map((cat) => (
-            <Button
-              key={cat}
-              variant="ghost"
-              size="sm"
-              onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-4 h-8 text-sm shrink-0 ${
-                activeCategory === cat
-                  ? darkMode 
-                    ? 'bg-white text-gray-900 hover:bg-gray-100' 
-                    : 'bg-gray-900 text-white hover:bg-gray-800'
-                  : darkMode 
-                    ? 'text-zinc-300 hover:text-white hover:bg-zinc-800' 
-                    : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              {cat}
-            </Button>
-          ))}
+        {/* Categories - Dynamic from API */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className={`text-sm font-semibold ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
+              Kategori
+            </h2>
+            {categories.length > categoriesPerPage && (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setCategoryPage(Math.max(0, categoryPage - 1))}
+                  disabled={categoryPage === 0}
+                  className={`h-7 w-7 ${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-500'}`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className={`text-xs px-2 ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
+                  {categoryPage + 1}/{totalCategoryPages}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setCategoryPage(Math.min(totalCategoryPages - 1, categoryPage + 1))}
+                  disabled={categoryPage >= totalCategoryPages - 1}
+                  className={`h-7 w-7 ${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-500'}`}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+          
+          {loadingCategories ? (
+            <div className="flex items-center gap-2 py-2">
+              <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+              <span className={`text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Memuat kategori...</span>
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {paginatedCategories.map((cat) => (
+                <Button
+                  key={cat.id}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`rounded-full px-4 h-8 text-sm shrink-0 ${
+                    activeCategory === cat.id
+                      ? darkMode 
+                        ? 'bg-white text-gray-900 hover:bg-gray-100' 
+                        : 'bg-gray-900 text-white hover:bg-gray-800'
+                      : darkMode 
+                        ? 'text-zinc-300 hover:text-white hover:bg-zinc-800 border border-zinc-700' 
+                        : 'text-gray-600 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  <span className="mr-1.5">{cat.icon}</span>
+                  {cat.name}
+                  {cat.count > 0 && (
+                    <span className={`ml-1.5 text-xs ${activeCategory === cat.id ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-zinc-500' : 'text-gray-400')}`}>
+                      {cat.count > 999 ? `${(cat.count/1000).toFixed(1)}K` : cat.count}
+                    </span>
+                  )}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Active Filters */}
+        {(activeCategory !== 'all' || activeCountry !== 'all') && (
+          <div className="flex items-center gap-2 mb-4">
+            <span className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Filter aktif:</span>
+            {activeCategory !== 'all' && (
+              <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${darkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-gray-100 text-gray-700'}`}>
+                {activeCategoryData?.icon} {activeCategoryData?.name}
+                <button onClick={() => setActiveCategory('all')} className="hover:text-rose-500 ml-1">×</button>
+              </span>
+            )}
+            {activeCountry !== 'all' && (
+              <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${darkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-gray-100 text-gray-700'}`}>
+                {activeCountryData?.flag} {activeCountryData?.name}
+                <button onClick={() => setActiveCountry('all')} className="hover:text-rose-500 ml-1">×</button>
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Results Count */}
-        <p className={`text-sm mb-4 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
-          {filteredVideos.length} video ditemukan
-        </p>
-
-        {/* Video Grid */}
-        <div className={viewMode === 'grid' 
-          ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'
-          : 'space-y-3'
-        }>
-          {filteredVideos.map((video) => (
-            viewMode === 'grid' ? (
-              <div 
-                key={video.id} 
-                className={`group cursor-pointer rounded-lg overflow-hidden ${darkMode ? 'hover:bg-zinc-900' : 'hover:bg-gray-50'}`}
-              >
-                <div className="relative aspect-video rounded-lg overflow-hidden mb-2.5">
-                  <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-white/95 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-lg">
-                      <Play className="w-5 h-5 text-gray-900 fill-gray-900 ml-0.5" />
-                    </div>
-                  </div>
-                  <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-white text-xs font-medium">
-                    {video.duration}
-                  </span>
-                </div>
-                <h3 className={`text-sm font-medium line-clamp-2 mb-1.5 leading-snug ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {video.title}
-                </h3>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <img src={video.channelAvatar} className="w-5 h-5 rounded-full" alt={video.channel} />
-                  <span className={`text-xs ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>{video.channel}</span>
-                </div>
-                <div className={`flex items-center gap-3 text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
-                  <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" />{video.views}</span>
-                  <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{video.publishedAt}</span>
-                </div>
-              </div>
-            ) : (
-              <div 
-                key={video.id} 
-                className={`flex cursor-pointer rounded-lg overflow-hidden ${darkMode ? 'hover:bg-zinc-900' : 'hover:bg-gray-50'}`}
-              >
-                <div className="relative w-40 sm:w-48 shrink-0">
-                  <img src={video.thumbnail} className="w-full aspect-video object-cover rounded-lg" alt={video.title} />
-                  <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-white text-xs font-medium">
-                    {video.duration}
-                  </span>
-                </div>
-                <div className="flex-1 p-3 flex items-center">
-                  <div className="flex-1 min-w-0">
-                    <h3 className={`text-sm font-medium line-clamp-2 mb-1.5 leading-snug ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                      {video.title}
-                    </h3>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <img src={video.channelAvatar} className="w-5 h-5 rounded-full" alt={video.channel} />
-                      <span className={`text-xs ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>{video.channel}</span>
-                    </div>
-                    <div className={`flex items-center gap-3 text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
-                      <span>{video.views} views</span>
-                      <span>{video.publishedAt}</span>
-                    </div>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className={`shrink-0 rounded-full ${darkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-gray-400'}`}
-                  >
-                    <Heart className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            )
-          ))}
+        <div className="flex items-center justify-between mb-4">
+          <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
+            {loading ? 'Memuat...' : `${filteredVideos.length} video ditemukan`}
+          </p>
+          {loading && <Loader2 className="w-4 h-4 animate-spin text-rose-500" />}
         </div>
 
+        {/* Loading State */}
+        {loading && videos.length === 0 && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
+          </div>
+        )}
+
+        {/* Video Grid */}
+        {!loading || videos.length > 0 ? (
+          <div className={viewMode === 'grid' 
+            ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'
+            : 'space-y-3'
+          }>
+            {filteredVideos.map((video) => (
+              viewMode === 'grid' ? (
+                <div 
+                  key={video.id} 
+                  className={`group cursor-pointer rounded-lg overflow-hidden ${darkMode ? 'hover:bg-zinc-900' : 'hover:bg-gray-50'}`}
+                  onClick={() => handlePlayVideo(video)}
+                >
+                  <div className="relative aspect-video rounded-lg overflow-hidden mb-2.5">
+                    <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-white/95 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow-lg">
+                        <Play className="w-5 h-5 text-gray-900 fill-gray-900 ml-0.5" />
+                      </div>
+                    </div>
+                    <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-white text-xs font-medium">
+                      {video.duration}
+                    </span>
+                  </div>
+                  <h3 className={`text-sm font-medium line-clamp-2 mb-1.5 leading-snug ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {video.title}
+                  </h3>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <img src={video.channelAvatar} className="w-5 h-5 rounded-full" alt={video.channel} />
+                    <span className={`text-xs ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>{video.channel}</span>
+                  </div>
+                  <div className={`flex items-center gap-3 text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
+                    <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" />{video.viewsFormatted}</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{video.publishedAtFormatted}</span>
+                  </div>
+                </div>
+              ) : (
+                <div 
+                  key={video.id} 
+                  className={`flex cursor-pointer rounded-lg overflow-hidden ${darkMode ? 'hover:bg-zinc-900' : 'hover:bg-gray-50'}`}
+                  onClick={() => handlePlayVideo(video)}
+                >
+                  <div className="relative w-40 sm:w-48 shrink-0">
+                    <img src={video.thumbnail} className="w-full aspect-video object-cover rounded-lg" alt={video.title} />
+                    <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-white text-xs font-medium">
+                      {video.duration}
+                    </span>
+                  </div>
+                  <div className="flex-1 p-3 flex items-center">
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`text-sm font-medium line-clamp-2 mb-1.5 leading-snug ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {video.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <img src={video.channelAvatar} className="w-5 h-5 rounded-full" alt={video.channel} />
+                        <span className={`text-xs ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>{video.channel}</span>
+                      </div>
+                      <div className={`flex items-center gap-3 text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
+                        <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" />{video.viewsFormatted}</span>
+                        <span>{video.publishedAtFormatted}</span>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className={`shrink-0 rounded-full ${darkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-gray-400'}`}
+                      onClick={(e) => { e.stopPropagation(); }}
+                    >
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )
+            ))}
+          </div>
+        ) : null}
+
         {/* Empty */}
-        {filteredVideos.length === 0 && (
+        {filteredVideos.length === 0 && !loading && (
           <div className="text-center py-16">
             <p className={`text-lg mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Tidak ada video</p>
             <p className={`text-sm mb-4 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Coba ubah filter pencarian</p>
             <Button 
               variant="outline" 
-              onClick={() => { setSearchQuery(''); setActiveCountry('all') }}
+              onClick={() => { setSearchQuery(''); setActiveCountry('all'); setActiveCategory('all') }}
               className={darkMode ? 'border-zinc-700 text-white hover:bg-zinc-800' : ''}
             >
               Reset Filter
@@ -297,13 +489,59 @@ export default function Home() {
           <div className="text-center mt-8">
             <Button 
               variant="outline"
+              onClick={fetchVideos}
+              disabled={loading}
               className={darkMode ? 'border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800' : ''}
             >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               Muat Lebih Banyak
             </Button>
           </div>
         )}
       </main>
+
+      {/* Video Player Modal */}
+      <Dialog open={isPlaying} onOpenChange={handleClosePlayer}>
+        <DialogContent className={`max-w-5xl w-[95vw] p-0 overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white'}`}>
+          {selectedVideo && (
+            <div className="relative">
+              {/* Video Player */}
+              <div className="relative aspect-video bg-black">
+                <iframe
+                  src={selectedVideo.video_url + '?autoplay=1'}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              
+              {/* Video Info */}
+              <div className="p-4">
+                <h2 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {selectedVideo.title}
+                </h2>
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="flex items-center gap-2">
+                    <img src={selectedVideo.channelAvatar} className="w-8 h-8 rounded-full" alt={selectedVideo.channel} />
+                    <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>{selectedVideo.channel}</span>
+                  </div>
+                  <div className={`flex items-center gap-1 text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
+                    <Eye className="w-4 h-4" />
+                    {selectedVideo.viewsFormatted} views
+                  </div>
+                  <div className={`flex items-center gap-1 text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
+                    <Clock className="w-4 h-4" />
+                    {selectedVideo.publishedAtFormatted}
+                  </div>
+                </div>
+                <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
+                  {selectedVideo.description}
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <footer className={`border-t ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50 border-gray-200'}`}>

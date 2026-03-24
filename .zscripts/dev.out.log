@@ -556,3 +556,174 @@ API Error: [TypeError: fetch failed] {
 }
  GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 10ms (compile: 1838µs, render: 8ms)
  GET / 200 in 39ms (compile: 2ms, render: 37ms)
+ GET / 200 in 34ms (compile: 2ms, render: 32ms)
+ GET / 200 in 42ms (compile: 8ms, render: 34ms)
+ GET / 200 in 30ms (compile: 3ms, render: 28ms)
+Categories API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/categories 200 in 63ms (compile: 1782µs, render: 61ms)
+API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 9ms (compile: 1246µs, render: 7ms)
+ GET / 200 in 67ms (compile: 2ms, render: 65ms)
+Categories API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/categories 200 in 12ms (compile: 1656µs, render: 11ms)
+API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 10ms (compile: 1758µs, render: 8ms)
+ GET / 200 in 36ms (compile: 1675µs, render: 34ms)
+ GET / 200 in 42ms (compile: 1885µs, render: 40ms)
+ GET / 200 in 38ms (compile: 1934µs, render: 36ms)
+ GET / 200 in 35ms (compile: 1852µs, render: 33ms)
+ GET / 200 in 35ms (compile: 1701µs, render: 34ms)
+ GET / 200 in 28ms (compile: 1888µs, render: 26ms)
+ GET / 200 in 29ms (compile: 1719µs, render: 27ms)
+Categories API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/categories 200 in 9ms (compile: 1599µs, render: 7ms)
+API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 7ms (compile: 1160µs, render: 6ms)
+ GET / 200 in 29ms (compile: 1646µs, render: 28ms)
+ GET / 200 in 30ms (compile: 2ms, render: 28ms)
+ GET / 200 in 25ms (compile: 2ms, render: 23ms)
+Categories API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/categories 200 in 12ms (compile: 1872µs, render: 10ms)
+API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 14ms (compile: 7ms, render: 7ms)
+ GET / 200 in 33ms (compile: 1998µs, render: 31ms)
+ GET / 200 in 25ms (compile: 1582µs, render: 23ms)
+API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 13ms (compile: 3ms, render: 11ms)
+Categories API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/categories 200 in 10ms (compile: 1304µs, render: 8ms)
+ GET / 200 in 43ms (compile: 3ms, render: 40ms)
+ GET / 200 in 35ms (compile: 2ms, render: 33ms)
+API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 10ms (compile: 1701µs, render: 8ms)
+Categories API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/categories 200 in 7ms (compile: 1145µs, render: 6ms)
+ GET / 200 in 29ms (compile: 1751µs, render: 27ms)
+ GET / 200 in 29ms (compile: 1644µs, render: 27ms)
+API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 9ms (compile: 1882µs, render: 7ms)
+Categories API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/categories 200 in 6ms (compile: 1038µs, render: 5ms)
+API Error: [TypeError: fetch failed] {
+  [cause]: Error: getaddrinfo ENOTFOUND api.brazer.video
+      at ignore-listed frames {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.brazer.video'
+  }
+}
+ GET /api/videos?page=1&limit=20&country=all&search=&category=all 200 in 9ms (compile: 1850µs, render: 7ms)
+ GET / 200 in 29ms (compile: 1748µs, render: 27ms)
